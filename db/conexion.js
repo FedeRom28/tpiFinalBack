@@ -4,7 +4,8 @@ const conexion = mysql.createConnection({
     host: "ctpoba.edu.ar",
     user: "rodriguezj",
     password: "46334366",
-    database: "24_72_rodriguezj"
+    database: "24_72_rodriguezj",
+    port:5713
 });
 
 conexion.connect(function(error){
