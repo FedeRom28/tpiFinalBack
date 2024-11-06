@@ -20,7 +20,7 @@ router.get("/", function (req, res, next) {
 // Obtener un producto específico por ID
 router.get("/:id", function (req, res, next) {
   const { id } = req.params;
-  const sql = "SELECT * FROM productos WHERE id = ?";
+  const sql = "SELECT * FROM productos WHERE id_productos = ?";
   conexion.query(sql, [id], function (error, result) {
     if (error) {
       console.error(error);
@@ -52,7 +52,7 @@ router.put("/:id", function (req, res, next) {
   const { id } = req.params;
   const { nombre_producto, descripcion, precio, id_categorias } = req.body;
 
-  const sql = `UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id = ?`;
+  const sql = `UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?`;
   conexion.query(sql, [nombre_producto, descripcion, precio, id_categorias, id], function (error, result) {
     if (error) {
       console.error(error);
@@ -66,7 +66,7 @@ router.put("/:id", function (req, res, next) {
 router.delete("/:id", function (req, res, next) {
   const { id } = req.params;
 
-  const sql = `DELETE FROM productos WHERE id = ?`;
+  const sql = `DELETE FROM productos WHERE id_productos = ?`;
   conexion.query(sql, [id], function (error, result) {
     if (error) {
       console.error(error);
