@@ -1,79 +1,53 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const { conexion } = require('../db/conexion');
+const { hashPassword, verificartoken } = require('@damianegreco/hashpass');
 
 // Obtener todos los administradores
-router.get("/", function (req, res, next) {
-  const sql = "SELECT * FROM administradores";
-  conexion.query(sql, function (error, result) {
+router.get('/', (req, res) => {
+  const sql = 'SELECT * FROM administradores';
+  conexion.query(sql, (error, results) => {
     if (error) {
       console.error(error);
-      return res.send("Ocurrió un error al obtener los administradores");
+      return res.status(500).json({ status: 'error', error: 'Ocurrió un error' });
     }
-    res.json({
-      status: "ok",
-      administradores: result
-    });
+    res.json({ status: 'ok', administradores: results });
   });
 });
 
-// Obtener un administrador específico por ID
-router.get("/:id", function (req, res, next) {
-  const { id } = req.params;
-  const sql = "SELECT * FROM administradores WHERE ID_administrador = ?";
-  conexion.query(sql, [id], function (error, result) {
-    if (error) {
-      console.error(error);
-      return res.send("Ocurrió un error al obtener el administrador");
-    }
-    res.json({
-      status: "ok",
-      administrador: result
-    });
-  });
-});
-
-// Crear un nuevo administrador
-router.post("/", function (req, res, next) {
+// Agregar un nuevo administrador
+router.post('/', async (req, res) => {
   const { nomadmin, contraseña, roll } = req.body;
+  try {
+    const hashedPassword = await hashPassword(contraseña);
 
-  const sql = `INSERT INTO administradores (nomadmin, contraseña, roll) VALUES (?, ?, ?)`;
-  conexion.query(sql, [nomadmin, contraseña, roll], function (error, result) {
-    if (error) {
-      console.error(error);
-      return res.send("Ocurrió un error al agregar el administrador");
-    }
-    res.json({ status: "ok", message: "Administrador agregado con éxito" });
-  });
+    const sql = `INSERT INTO administradores (nomadmin, contraseña, roll) VALUES (?, ?, ?)`;
+    conexion.query(sql, [nomadmin, hashedPassword, roll], (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 'error', error: 'Ocurrió un error al agregar el administrador' });
+      }
+      res.json({ status: 'ok', message: 'Administrador agregado exitosamente' });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', error: 'Ocurrió un error al encriptar la contraseña' });
+  }
 });
 
-// Actualizar un administrador por ID
-router.put("/:id", function (req, res, next) {
-  const { id } = req.params;
-  const { nomadmin, contraseña, roll } = req.body;
-
-  const sql = `UPDATE administradores SET nomadmin = ?, contraseña = ?, roll = ? WHERE ID_administrador = ?`;
-  conexion.query(sql, [nomadmin, contraseña, roll, id], function (error, result) {
-    if (error) {
-      console.error(error);
-      return res.status(500).send("Ocurrió un error al actualizar el administrador");
-    }
-    res.json({ status: "ok", message: "Administrador actualizado con éxito" });
-  });
-});
-
-// Eliminar un administrador por ID
-router.delete("/:id", function (req, res, next) {
-  const { id } = req.params;
-
-  const sql = `DELETE FROM administradores WHERE ID_administrador = ?`;
-  conexion.query(sql, [id], function (error, result) {
-    if (error) {
-      console.error(error);
-      return res.status(500).send("Ocurrió un error al eliminar el administrador");
-    }
-    res.json({ status: "ok", message: "Administrador eliminado con éxito" });
-  });
+// Verificar token de autenticación (si es necesario en el proyecto)
+router.use((req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(403).json({ status: 'error', error: 'Sin token' });
+  }
+  
+  const verificacion = verificartoken(token, process.env.TOKEN_SECRET);
+  if (!verificacion) {
+    return res.status(403).json({ status: 'error', error: 'Token inválido' });
+  }
+  
+  next();
 });
 
 module.exports = router;
