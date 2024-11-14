@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { conexion } = require('../db/conexion');
-const { hashPassword, verificartoken } = require('@damianegreco/hashpass');
+const { hashPassword, verificartoken, generarToken } = require('@damianegreco/hashpass');
 
 // Obtener todos los administradores
 router.get('/', (req, res) => {

@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.1"
+    "@damianegreco/hashpass": "^2.0.0",
+    "express": "^4.21.1",
+    "sql": "^0.78.0"
   }
 }
