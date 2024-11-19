@@ -1,53 +1,120 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
-const { hashPassword, verificartoken } = require('@damianegreco/hashpass');
+const { hashpassword, verificartoken, generatetoken, verifyhash } = require('@damianegreco/hashpass');
 
 // Obtener todos los administradores
-router.get('/', (req, res) => {
-  const sql = 'SELECT * FROM administradores';
-  conexion.query(sql, (error, results) => {
+router.get("/", function (req, res, next) {
+  const sql = "SELECT * FROM administradores";
+  conexion.query(sql, function (error, result) {
     if (error) {
       console.error(error);
-      return res.status(500).json({ status: 'error', error: 'Ocurrió un error' });
+      return res.status(500).send("Ocurrió un error al obtener los administradores");
     }
-    res.json({ status: 'ok', administradores: results });
+    res.json({
+      status: "ok",
+      administradores: result
+    });
   });
 });
 
-// Agregar un nuevo administrador
-router.post('/', async (req, res) => {
-  const { nomadmin, contraseña, roll } = req.body;
-  try {
-    const hashedPassword = await hashPassword(contraseña);
+// Login para generar token
+router.post("/login", async function (req, res, next) {
+  const { nomadmin, contraseña } = req.body;
 
+  const sql = "SELECT * FROM administradores WHERE nomadmin = ?";
+  conexion.query(sql, [nomadmin], async function (error, result) {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Ocurrió un error al autenticar al administrador");
+    }
+    if (result.length === 0) {
+      return res.status(404).send("Administrador no encontrado");
+    }
+
+    const admin = result[0];
+    const passwordMatch = await verifyhash(contraseña, admin.contraseña);
+
+    if (passwordMatch) {
+      const token = generatetoken({ id: admin.ID_administrador, nomadmin: admin.nomadmin });
+      res.json({ status: "ok", token });
+    } else {
+      res.status(401).send("Contraseña incorrecta");
+    }
+  });
+});
+
+// Obtener un administrador por ID
+router.get("/:id", function (req, res, next) {
+  const { id } = req.params;
+  const sql = "SELECT * FROM administradores WHERE ID_administrador = ?";
+  conexion.query(sql, [id], function (error, result) {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Ocurrió un error al obtener el administrador");
+    }
+    if (result.length === 0) {
+      return res.status(404).send("Administrador no encontrado");
+    }
+    res.json({
+      status: "ok",
+      administrador: result[0]
+    });
+  });
+});
+
+// Crear un nuevo administrador
+router.post("/", async function (req, res, next) {
+  const { nomadmin, contraseña, roll } = req.body;
+
+  try {
+    const hashedPassword = await hashpassword(contraseña);
     const sql = `INSERT INTO administradores (nomadmin, contraseña, roll) VALUES (?, ?, ?)`;
-    conexion.query(sql, [nomadmin, hashedPassword, roll], (error, result) => {
+    conexion.query(sql, [nomadmin, hashedPassword, roll], function (error, result) {
       if (error) {
         console.error(error);
-        return res.status(500).json({ status: 'error', error: 'Ocurrió un error al agregar el administrador' });
+        return res.status(500).send("Ocurrió un error al agregar el administrador");
       }
-      res.json({ status: 'ok', message: 'Administrador agregado exitosamente' });
+      res.json({ status: "ok", message: "Administrador agregado con éxito", ID_administrador: result.insertId });
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: 'error', error: 'Ocurrió un error al encriptar la contraseña' });
+    console.error("Error al encriptar la contraseña:", error);
+    res.status(500).send("Error interno del servidor");
   }
 });
 
-// Verificar token de autenticación (si es necesario en el proyecto)
-router.use((req, res, next) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(403).json({ status: 'error', error: 'Sin token' });
+// Actualizar un administrador
+router.put("/:id", async function (req, res, next) {
+  const { id } = req.params;
+  const { nomadmin, contraseña, roll } = req.body;
+
+  try {
+    const hashedPassword = await hashpassword(contraseña);
+    const sql = "UPDATE administradores SET nomadmin = ?, contraseña = ?, roll = ? WHERE ID_administrador = ?";
+    conexion.query(sql, [nomadmin, hashedPassword, roll, id], function (error, result) {
+      if (error) {
+        console.error(error);
+        return res.status(500).send("Ocurrió un error al actualizar el administrador");
+      }
+      res.json({ status: "ok", message: "Administrador actualizado con éxito" });
+    });
+  } catch (error) {
+    console.error("Error al encriptar la contraseña:", error);
+    res.status(500).send("Error interno del servidor");
   }
-  
-  const verificacion = verificartoken(token, process.env.TOKEN_SECRET);
-  if (!verificacion) {
-    return res.status(403).json({ status: 'error', error: 'Token inválido' });
-  }
-  
-  next();
+});
+
+// Eliminar un administrador
+router.delete("/:id", function (req, res, next) {
+  const { id } = req.params;
+  const sql = "DELETE FROM administradores WHERE ID_administrador = ?";
+  conexion.query(sql, [id], function (error, result) {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Ocurrió un error al eliminar el administrador");
+    }
+    res.json({ status: "ok", message: "Administrador eliminado con éxito" });
+  });
 });
 
 module.exports = router;
