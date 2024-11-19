@@ -3,12 +3,9 @@
   "private": true,
   "version": "0.0.0",
 "scripts": {
-  "start": "node index.js",
-  "dev": "nodemon index.js",
+  "start": "node --watch index.js",
   "test": "echo \"Error: no test specified\" && exit 1"
 },
-
-
   "dependencies": {
     "bcrypt": "^5.1.1",
     "express": "^4.21.1",

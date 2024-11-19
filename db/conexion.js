@@ -5,14 +5,8 @@ const conexion = mysql.createConnection({
     host: "ctpoba.edu.ar",
     user: "rodriguezj",
     password: "46334366",
-    database: "24_72_rodriguezj" 
-
-    host:"ctpoba.edu.ar",
-    user:"rodriguezj",
-    password:"46334366",
-    database:"24_72_b"
-
-}
+    database: "24_72_B" 
+})
 conexion.connect(function(error){
     if(error) {
         console.error(error);
@@ -24,8 +18,4 @@ conexion.connect(function(error){
 
 module.exports = { conexion };
 
-    console.log("Conectado correctamente a la db")
-
-
-module.exports = { conexion } 
 
