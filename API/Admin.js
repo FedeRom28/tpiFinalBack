@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
-const { hashpassword, verificartoken } = require('@damianegreco/hashpass');
+const { hashpassword, verificartoken, generatetoken, verifyhash } = require('@damianegreco/hashpass');
 
 // Obtener todos los administradores
 router.get("/", function (req, res, next) {
@@ -15,6 +15,32 @@ router.get("/", function (req, res, next) {
       status: "ok",
       administradores: result
     });
+  });
+});
+
+// Login para generar token
+router.post("/login", async function (req, res, next) {
+  const { nomadmin, contraseña } = req.body;
+
+  const sql = "SELECT * FROM administradores WHERE nomadmin = ?";
+  conexion.query(sql, [nomadmin], async function (error, result) {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Ocurrió un error al autenticar al administrador");
+    }
+    if (result.length === 0) {
+      return res.status(404).send("Administrador no encontrado");
+    }
+
+    const admin = result[0];
+    const passwordMatch = await verifyhash(contraseña, admin.contraseña);
+
+    if (passwordMatch) {
+      const token = generatetoken({ id: admin.ID_administrador, nomadmin: admin.nomadmin });
+      res.json({ status: "ok", token });
+    } else {
+      res.status(401).send("Contraseña incorrecta");
+    }
   });
 });
 
