@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
-const { hashpassword, verificartoken, generatetoken, verifyhash } = require('@damianegreco/hashpass');
+const { hashPass, verificarToken, generarToken, verificarPass } = require('@damianegreco/hashpass');
 
 // Obtener todos los administradores
 router.get("/", function (req, res, next) {
-  const sql = "SELECT * FROM administradores";
+  const sql = "SELECT ID_administrador, nomadmin, contraseña FROM administradores"; // Eliminado 'roll'
   conexion.query(sql, function (error, result) {
     if (error) {
       console.error(error);
@@ -18,12 +18,10 @@ router.get("/", function (req, res, next) {
   });
 });
 
-
-
 // Obtener un administrador por ID
 router.get("/:id", function (req, res, next) {
   const { id } = req.params;
-  const sql = "SELECT * FROM administradores WHERE ID_administrador = ?";
+  const sql = "SELECT ID_administrador, nomadmin, contraseña FROM administradores WHERE ID_administrador = ?"; // Eliminado 'roll'
   conexion.query(sql, [id], function (error, result) {
     if (error) {
       console.error(error);
@@ -41,12 +39,12 @@ router.get("/:id", function (req, res, next) {
 
 // Crear un nuevo administrador
 router.post("/", async function (req, res, next) {
-  const { nomadmin, contraseña, roll } = req.body;
+  const { nomadmin, contraseña } = req.body;
 
   try {
     const hashedPassword = await hashpassword(contraseña);
-    const sql = `INSERT INTO administradores (nomadmin, contraseña, roll) VALUES (?, ?, ?)`;
-    conexion.query(sql, [nomadmin, hashedPassword, roll], function (error, result) {
+    const sql = `INSERT INTO administrador(nomadmin, contraseña) VALUES (?, ?)`; 
+    conexion.query(sql, [nomadmin, hashedPassword], function (error, result) {
       if (error) {
         console.error(error);
         return res.status(500).send("Ocurrió un error al agregar el administrador");
@@ -62,12 +60,12 @@ router.post("/", async function (req, res, next) {
 // Actualizar un administrador
 router.put("/:id", async function (req, res, next) {
   const { id } = req.params;
-  const { nomadmin, contraseña, roll } = req.body;
+  const { nomadmin, contraseña } = req.body; 
 
   try {
     const hashedPassword = await hashpassword(contraseña);
-    const sql = "UPDATE administradores SET nomadmin = ?, contraseña = ?, roll = ? WHERE ID_administrador = ?";
-    conexion.query(sql, [nomadmin, hashedPassword, roll, id], function (error, result) {
+    const sql = "UPDATE administrador SET nomadmin = ?, contraseña = ? WHERE ID_administrador = ?";
+    conexion.query(sql, [nomadmin, hashedPassword, id], function (error, result) {
       if (error) {
         console.error(error);
         return res.status(500).send("Ocurrió un error al actualizar el administrador");
@@ -83,7 +81,7 @@ router.put("/:id", async function (req, res, next) {
 // Eliminar un administrador
 router.delete("/:id", function (req, res, next) {
   const { id } = req.params;
-  const sql = "DELETE FROM administradores WHERE ID_administrador = ?";
+  const sql = "DELETE FROM administrador WHERE ID_administrador = ?";
   conexion.query(sql, [id], function (error, result) {
     if (error) {
       console.error(error);
