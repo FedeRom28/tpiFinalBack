@@ -2,11 +2,10 @@
   "name": "api",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "start": "node index.js",
-  "dev": "nodemon index.js"
-},
-
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -14,7 +13,7 @@
   "dependencies": {
     "@damianegreco/hashpass": "^2.0.0",
     "express": "^4.21.1",
-    "sql": "^0.78.0"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
