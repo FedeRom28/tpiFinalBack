@@ -17,7 +17,7 @@ router.get("/", function (req, res, next) {
   });
 });
 
-// Obtener un producto específico por ID
+
 router.get("/:id", function (req, res, next) {
   const { id } = req.params;
   const sql = "SELECT * FROM productos WHERE id_productos = ?";
