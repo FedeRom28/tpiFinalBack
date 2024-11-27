@@ -17,7 +17,7 @@ router.get("/", function (req, res, next) {
   });
 });
 
-
+// Obtener un producto por ID
 router.get("/:id", function (req, res, next) {
   const { id } = req.params;
   const sql = "SELECT * FROM productos WHERE id_productos = ?";
@@ -36,8 +36,8 @@ router.get("/:id", function (req, res, next) {
 // Crear un nuevo producto
 router.post("/", function (req, res, next) {
   const { nombre_producto, descripcion, precio, id_categorias } = req.body;
-
-  const sql = `INSERT INTO productos (nombre_producto, descripcion, precio, id_categorias) VALUES (?, ?, ?, ?)`;
+  
+  const sql = "INSERT INTO productos (nombre_producto, descripcion, precio, id_categorias) VALUES (?, ?, ?, ?)";
   conexion.query(sql, [nombre_producto, descripcion, precio, id_categorias], function (error, result) {
     if (error) {
       console.error(error);
@@ -51,8 +51,8 @@ router.post("/", function (req, res, next) {
 router.put("/:id", function (req, res, next) {
   const { id } = req.params;
   const { nombre_producto, descripcion, precio, id_categorias } = req.body;
-
-  const sql = `UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?`;
+  
+  const sql = "UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?";
   conexion.query(sql, [nombre_producto, descripcion, precio, id_categorias, id], function (error, result) {
     if (error) {
       console.error(error);
@@ -65,8 +65,8 @@ router.put("/:id", function (req, res, next) {
 // Eliminar un producto por ID
 router.delete("/:id", function (req, res, next) {
   const { id } = req.params;
-
-  const sql = `DELETE FROM productos WHERE id_productos = ?`;
+  
+  const sql = "DELETE FROM productos WHERE id_productos = ?";
   conexion.query(sql, [id], function (error, result) {
     if (error) {
       console.error(error);
