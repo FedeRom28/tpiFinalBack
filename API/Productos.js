@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
 
+
 // Obtener todos los productos
 router.get("/", function (req, res, next) {
   const sql = "SELECT * FROM productos";
@@ -35,10 +36,10 @@ router.get("/:id", function (req, res, next) {
 
 // Crear un nuevo producto
 router.post("/", function (req, res, next) {
-  const { nombre_producto, descripcion, precio, id_categorias } = req.body;
+  const { nom_producto, descripcion, precio, id_categorias } = req.body;
   
-  const sql = "INSERT INTO productos (nombre_producto, descripcion, precio, id_categorias) VALUES (?, ?, ?, ?)";
-  conexion.query(sql, [nombre_producto, descripcion, precio, id_categorias], function (error, result) {
+  const sql = "INSERT INTO productos (nom_producto, descripcion, precio, id_categorias) VALUES (?, ?, ?, ?)";
+  conexion.query(sql, [nom_producto, descripcion, precio, id_categorias], function (error, result) {
     if (error) {
       console.error(error);
       return res.send("Ocurrió un error al agregar el producto");
@@ -50,10 +51,10 @@ router.post("/", function (req, res, next) {
 // Actualizar un producto por ID
 router.put("/:id", function (req, res, next) {
   const { id } = req.params;
-  const { nombre_producto, descripcion, precio, id_categorias } = req.body;
+  const { nom_producto, descripcion, precio, id_categorias } = req.body;
   
-  const sql = "UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?";
-  conexion.query(sql, [nombre_producto, descripcion, precio, id_categorias, id], function (error, result) {
+  const sql = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?";
+  conexion.query(sql, [nom_producto, descripcion, precio, id_categorias, id], function (error, result) {
     if (error) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al actualizar el producto");

@@ -4,7 +4,7 @@ const port = 3000;
 
 app.use(express.json());
 
-const apiMain = require('./api/main.js')
+const apiMain = require('./API/main.js')
 
 app.get("/", function (req, res, next) {
     res.send("app express")
