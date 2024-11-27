@@ -124,7 +124,7 @@ router.put('/:id', function (req, res, next) {
 });
 
 // Eliminar un administrador
-router.delete('/', function (req, res, next) {
+router.delete('/:id', function (req, res, next) {
     const { id } = req.params;
     const sql = "DELETE FROM administrador WHERE id = ?";
     conexion.query(sql, [id], function (error, result) {
