@@ -3,6 +3,7 @@ const router = express.Router();
 const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
 
+// Funciones auxiliares para manejar promesas
 const checkUsuario = function (nom_admin) {
     return new Promise((resolve, reject) => {
         const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
@@ -16,7 +17,7 @@ const checkUsuario = function (nom_admin) {
 
 const guardarUsuario = function (nom_admin, passHasheada) {
     return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO administrador (nom_admin, contraseña) VALUES (?,?)";
+        const sql = "INSERT INTO administrador (nom_admin, contraseña) VALUES (?, ?)";
         conexion.query(sql, [nom_admin, passHasheada], function (error, result) {
             if (error) return reject(error);
             return resolve(result.insertId);
@@ -28,6 +29,11 @@ const guardarUsuario = function (nom_admin, passHasheada) {
 router.post('/', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
+    if (!nom_admin || !contraseña) {
+        console.error("nom_admin o contraseña están vacíos");
+        return res.status(400).send("nom_admin y contraseña son obligatorios");
+    }
+
     checkUsuario(nom_admin)
         .then(() => {
             const passHasheada = hashPass(contraseña);
@@ -35,6 +41,10 @@ router.post('/', function (req, res, next) {
                 .then((id) => {
                     res.json({ status: 'ok', id });
                 })
+                .catch((error) => {
+                    console.error(error);
+                    res.json({ status: 'error', error });
+                });
         })
         .catch((error) => {
             console.error(error);
@@ -45,6 +55,11 @@ router.post('/', function (req, res, next) {
 // Login y generación de token
 router.post('/login', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
+
+    if (!nom_admin || !contraseña) {
+        console.error("nom_admin o contraseña están vacíos");
+        return res.status(400).send("nom_admin y contraseña son obligatorios");
+    }
 
     const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
     conexion.query(sql, [nom_admin], function (error, result) {
@@ -101,29 +116,28 @@ router.get('/:id', function (req, res, next) {
     });
 });
 
-// Actualizar un administrador
+// Actualizar un administrador por ID
 router.put('/:id', function (req, res, next) {
     const { id } = req.params;
     const { nom_admin, contraseña } = req.body;
 
-    hashPass(contraseña, function (err, passHasheada) {
-        if (err) {
-            console.error("Error al encriptar la contraseña:", err);
-            return res.status(500).send("Error interno del servidor");
-        }
+    if (!nom_admin || !contraseña) {
+        console.error("nom_admin o contraseña están vacíos");
+        return res.status(400).send("nom_admin y contraseña son obligatorios");
+    }
 
-        const sql = "UPDATE administrador SET nom_admin = ?, contraseña = ? WHERE id = ?";
-        conexion.query(sql, [nom_admin, passHasheada, id], function (error, result) {
-            if (error) {
-                console.error(error);
-                return res.status(500).send("Ocurrió un error al actualizar el administrador");
-            }
-            res.json({ status: "ok", message: "Administrador actualizado con éxito" });
-        });
+    const passHasheada = hashPass(contraseña);
+    const sql = "UPDATE administrador SET nom_admin = ?, contraseña = ? WHERE id = ?";
+    conexion.query(sql, [nom_admin, passHasheada, id], function (error, result) {
+        if (error) {
+            console.error(error);
+            return res.status(500).send("Ocurrió un error al actualizar el administrador");
+        }
+        res.json({ status: "ok", message: "Administrador actualizado con éxito" });
     });
 });
 
-// Eliminar un administrador
+// Eliminar un administrador por ID
 router.delete('/:id', function (req, res, next) {
     const { id } = req.params;
     const sql = "DELETE FROM administrador WHERE id = ?";

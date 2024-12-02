@@ -50,8 +50,8 @@ router.post("/", function (req, res, next) {
 });
 
 // Actualizar un producto por ID
-router.put("/", function (req, res, next) {
-    const { id } = req.query;
+router.put("/:id", function (req, res, next) {
+    const { id } = req.params;
     const { nom_producto, descripcion, precio, id_categorias } = req.body;
     const sql = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?";
     conexion.query(sql, [nom_producto, descripcion, precio, id_categorias, id], function (error, result) {
@@ -64,8 +64,8 @@ router.put("/", function (req, res, next) {
 });
 
 // Eliminar un producto por ID
-router.delete("/", function (req, res, next) {
-    const { id } = req.query;
+router.delete("/:id", function (req, res, next) {
+    const { id } = req.params;
     const sql = "DELETE FROM productos WHERE id_productos = ?";
     conexion.query(sql, [id], function (error, result) {
         if (error) {
