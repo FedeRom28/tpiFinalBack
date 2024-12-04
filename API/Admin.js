@@ -30,7 +30,6 @@ router.post('/', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
     if (!nom_admin || !contraseña) {
-        console.error("nom_admin o contraseña están vacíos");
         return res.status(400).send("nom_admin y contraseña son obligatorios");
     }
 
@@ -57,7 +56,6 @@ router.post('/login', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
     if (!nom_admin || !contraseña) {
-        console.error("nom_admin o contraseña están vacíos");
         return res.status(400).send("nom_admin y contraseña son obligatorios");
     }
 
@@ -104,7 +102,7 @@ router.get('/', function (req, res, next) {
 router.get('/:id', function (req, res, next) {
     const { id } = req.params;
     const sql = "SELECT id, nom_admin, contraseña FROM administrador WHERE id = ?";
-    conexion.query(sql, [id], function (error, result) {
+    conexion.query(sql, [parseInt(id)], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al obtener el administrador");
@@ -122,13 +120,12 @@ router.put('/:id', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
     if (!nom_admin || !contraseña) {
-        console.error("nom_admin o contraseña están vacíos");
         return res.status(400).send("nom_admin y contraseña son obligatorios");
     }
 
     const passHasheada = hashPass(contraseña);
     const sql = "UPDATE administrador SET nom_admin = ?, contraseña = ? WHERE id = ?";
-    conexion.query(sql, [nom_admin, passHasheada, id], function (error, result) {
+    conexion.query(sql, [nom_admin, passHasheada, parseInt(id)], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al actualizar el administrador");
@@ -141,7 +138,7 @@ router.put('/:id', function (req, res, next) {
 router.delete('/:id', function (req, res, next) {
     const { id } = req.params;
     const sql = "DELETE FROM administrador WHERE id = ?";
-    conexion.query(sql, [id], function (error, result) {
+    conexion.query(sql, [parseInt(id)], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al eliminar el administrador");
