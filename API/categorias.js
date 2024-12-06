@@ -48,7 +48,7 @@ router.post("/", function (req, res, next) {
     conexion.query(sql, [nom_categoria], function (error, result) {
         if (error) {
             console.error(error);
-            return res.send("Ocurrió un error al agregar la categoría");
+            return res.status(500).send("Ocurrió un error al agregar la categoría");
         }
         res.json({ status: "ok", message: "Categoría agregada exitosamente", id: result.insertId });
     });

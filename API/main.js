@@ -5,6 +5,7 @@ const { verificarToken } = require('@damianegreco/hashpass');
 // Importar las rutas de admin y productos
 const adminRouter = require('./Admin.js');
 const productosRouter = require('./Productos.js');
+const categoriasRouter = require('./categorias.js');
 
 const TOKEN_SECRET = "46334366";
 
@@ -35,5 +36,6 @@ const verificarTokenMiddleware = (req, res, next) => {
 // Usar las rutas de admin y productos
 router.use('/Admin', adminRouter);
 router.use('/productos', productosRouter);
+router.use('/categorias', categoriasRouter);
 
 module.exports = router;
