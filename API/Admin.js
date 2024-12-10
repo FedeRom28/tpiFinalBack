@@ -3,24 +3,12 @@ const router = express.Router();
 const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
 
-// Funciones auxiliares para manejar promesas
-const checkUsuario = function (nom_admin) {
+// Función envolvente para verificar la contraseña con promesas
+const verificarPassPromise = (contraseña, contraseñaHasheada) => {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
-        conexion.query(sql, [nom_admin], function (error, result) {
+        verificarPass(contraseña, contraseñaHasheada, (error, match) => {
             if (error) return reject(error);
-            if (result.length > 0) return reject("Usuario ya registrado");
-            return resolve();
-        });
-    });
-};
-
-const guardarUsuario = function (nom_admin, passHasheada) {
-    return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO administrador (nom_admin, contraseña) VALUES (?, ?)";
-        conexion.query(sql, [nom_admin, passHasheada], function (error, result) {
-            if (error) return reject(error);
-            return resolve(result.insertId);
+            resolve(match);
         });
     });
 };
@@ -55,6 +43,8 @@ router.post('/', function (req, res, next) {
 router.post('/login', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
+    console.log('Datos recibidos:', { nom_admin, contraseña });
+
     if (!nom_admin || !contraseña) {
         return res.status(400).send("nom_admin y contraseña son obligatorios");
     }
@@ -70,7 +60,13 @@ router.post('/login', function (req, res, next) {
         }
 
         const admin = result[0];
-        verificarPass(contraseña, admin.contraseña)
+        
+        if (!admin.id) {
+            console.error("Administrador sin ID");
+            return res.status(500).send("Administrador sin ID");
+        }
+
+        verificarPassPromise(contraseña, admin.contraseña)
             .then(match => {
                 if (match) {
                     const token = generarToken({ id: admin.id, nom_admin: admin.nom_admin });
@@ -85,6 +81,28 @@ router.post('/login', function (req, res, next) {
             });
     });
 });
+
+// Funciones auxiliares para manejar promesas
+const checkUsuario = function (nom_admin) {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
+        conexion.query(sql, [nom_admin], function (error, result) {
+            if (error) return reject(error);
+            if (result.length > 0) return reject("Usuario ya registrado");
+            return resolve();
+        });
+    });
+};
+
+const guardarUsuario = function (nom_admin, passHasheada) {
+    return new Promise((resolve, reject) => {
+        const sql = "INSERT INTO administrador (nom_admin, contraseña) VALUES (?, ?)";
+        conexion.query(sql, [nom_admin, passHasheada], function (error, result) {
+            if (error) return reject(error);
+            return resolve(result.insertId);
+        });
+    });
+};
 
 // Obtener todos los administradores
 router.get('/', function (req, res, next) {
@@ -101,8 +119,14 @@ router.get('/', function (req, res, next) {
 // Obtener un administrador por ID
 router.get('/:id', function (req, res, next) {
     const { id } = req.params;
+    const parsedId = parseInt(id, 10);
+    
+    if (isNaN(parsedId)) {
+        return res.status(400).send("ID no válido");
+    }
+
     const sql = "SELECT id, nom_admin, contraseña FROM administrador WHERE id = ?";
-    conexion.query(sql, [parseInt(id)], function (error, result) {
+    conexion.query(sql, [parsedId], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al obtener el administrador");
@@ -117,7 +141,12 @@ router.get('/:id', function (req, res, next) {
 // Actualizar un administrador por ID
 router.put('/:id', function (req, res, next) {
     const { id } = req.params;
+    const parsedId = parseInt(id, 10);
     const { nom_admin, contraseña } = req.body;
+
+    if (isNaN(parsedId)) {
+        return res.status(400).send("ID no válido");
+    }
 
     if (!nom_admin || !contraseña) {
         return res.status(400).send("nom_admin y contraseña son obligatorios");
@@ -125,7 +154,7 @@ router.put('/:id', function (req, res, next) {
 
     const passHasheada = hashPass(contraseña);
     const sql = "UPDATE administrador SET nom_admin = ?, contraseña = ? WHERE id = ?";
-    conexion.query(sql, [nom_admin, passHasheada, parseInt(id)], function (error, result) {
+    conexion.query(sql, [nom_admin, passHasheada, parsedId], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al actualizar el administrador");
@@ -137,8 +166,14 @@ router.put('/:id', function (req, res, next) {
 // Eliminar un administrador por ID
 router.delete('/:id', function (req, res, next) {
     const { id } = req.params;
+    const parsedId = parseInt(id, 10);
+
+    if (isNaN(parsedId)) {
+        return res.status(400).send("ID no válido");
+    }
+
     const sql = "DELETE FROM administrador WHERE id = ?";
-    conexion.query(sql, [parseInt(id)], function (error, result) {
+    conexion.query(sql, [parsedId], function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al eliminar el administrador");
