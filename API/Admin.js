@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
+const TOKEN_SECRET = "46334366";
 
 // Función envolvente para verificar la contraseña con promesas
 const verificarPassPromise = (contraseña, contraseñaHasheada) => {
@@ -37,61 +38,32 @@ router.post('/Crear', function (req, res, next) {
         });
 });
 
-// Login y generación de token
+// Login y generación de token para el administrador
 router.post('/login', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
-    const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
+    const sql = 'SELECT id, nom_admin, contraseña FROM administrador WHERE nom_admin = ?';
     conexion.query(sql, [nom_admin], function (error, result) {
         if (error) {
-            return res.status(500).send("Ocurrió un error al autenticar al administrador");
+            console.error(error);
+            return res.status(500).json({ status: 'error', error });
         }
-        if (result.length === 0) {
-            return res.status(404).send("Administrador no encontrado");
-        }
-
-        const admin = result[0];
-        
-        if (!admin.id) {
-            return res.status(500).send("Administrador sin ID");
+        if (result.length !== 1) {
+            console.error('Error al buscar administrador (Usuario Incorrecto)');
+            return res.status(403).json({ status: 'error', error: 'Error al buscar administrador (Usuario incorrecto)' });
         }
 
-        verificarPassPromise(contraseña, admin.contraseña)
-            .then(match => {
-                if (match) {
-                    const token = generarToken({ id: admin.id, nom_admin: admin.nom_admin });
-                    res.json({ status: "ok", token });
-                } else {
-                    res.status(401).send("Contraseña incorrecta");
-                }
-            })
-            .catch(error => {
-                res.status(500).send("Error interno del servidor");
-            });
+        if (verificarPass(contraseña, result[0].contraseña)) {
+            console.log('Inicio Correctamente');
+            const token = generarToken(TOKEN_SECRET, 6, { admin_id: result[0].id, nom_admin: nom_admin });
+            console.log(token);
+            return res.json({ status: 'ok', token, admin_id: result[0].id });
+        } else {
+            console.error('Usuario/Contraseña incorrecto');
+            return res.status(403).json({ status: 'error', error: 'Usuario/Contraseña incorrecto' });
+        }
     });
 });
-
-// Funciones auxiliares para manejar promesas
-const checkUsuario = function (nom_admin) {
-    return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
-        conexion.query(sql, [nom_admin], function (error, result) {
-            if (error) return reject(error);
-            if (result.length > 0) return reject("Usuario ya registrado");
-            return resolve();
-        });
-    });
-};
-
-const guardarUsuario = function (nom_admin, passHasheada) {
-    return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO administrador (nom_admin, contraseña) VALUES (?, ?)";
-        conexion.query(sql, [nom_admin, passHasheada], function (error, result) {
-            if (error) return reject(error);
-            return resolve(result.insertId);
-        });
-    });
-};
 
 // Obtener todos los administradores
 router.get('/', function (req, res, next) {

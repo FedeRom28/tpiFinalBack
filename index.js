@@ -13,13 +13,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const apiMain = require('./API/main.js');
+const apiMain = require('./api/main.js');
 
 app.get("/", function (req, res, next) {
   res.send("app express");
 });
 
-app.use('/API/', apiMain);
+app.use('/api/', apiMain);
 
 app.listen(port, () => {
   console.log(`Ejecutando servidor en puerto ${port}`);
