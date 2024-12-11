@@ -14,7 +14,7 @@ const verificarPassPromise = (contraseña, contraseñaHasheada) => {
 };
 
 // Crear un nuevo administrador
-router.post('/', function (req, res, next) {
+router.post('/Crear', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
     if (!nom_admin || !contraseña) {
@@ -29,13 +29,11 @@ router.post('/', function (req, res, next) {
                     res.json({ status: 'ok', id });
                 })
                 .catch((error) => {
-                    console.error(error);
-                    res.json({ status: 'error', error });
+                    res.status(500).json({ status: 'error', error });
                 });
         })
         .catch((error) => {
-            console.error(error);
-            res.json({ status: 'error', error });
+            res.status(500).json({ status: 'error', error });
         });
 });
 
@@ -43,16 +41,9 @@ router.post('/', function (req, res, next) {
 router.post('/login', function (req, res, next) {
     const { nom_admin, contraseña } = req.body;
 
-    console.log('Datos recibidos:', { nom_admin, contraseña });
-
-    if (!nom_admin || !contraseña) {
-        return res.status(400).send("nom_admin y contraseña son obligatorios");
-    }
-
     const sql = "SELECT * FROM administrador WHERE nom_admin = ?";
     conexion.query(sql, [nom_admin], function (error, result) {
         if (error) {
-            console.error(error);
             return res.status(500).send("Ocurrió un error al autenticar al administrador");
         }
         if (result.length === 0) {
@@ -62,7 +53,6 @@ router.post('/login', function (req, res, next) {
         const admin = result[0];
         
         if (!admin.id) {
-            console.error("Administrador sin ID");
             return res.status(500).send("Administrador sin ID");
         }
 
@@ -76,7 +66,6 @@ router.post('/login', function (req, res, next) {
                 }
             })
             .catch(error => {
-                console.error("Error al verificar la contraseña:", error);
                 res.status(500).send("Error interno del servidor");
             });
     });
@@ -109,7 +98,6 @@ router.get('/', function (req, res, next) {
     const sql = "SELECT id, nom_admin, contraseña FROM administrador";
     conexion.query(sql, function (error, result) {
         if (error) {
-            console.error(error);
             return res.status(500).send("Ocurrió un error al obtener los administradores");
         }
         res.json({ status: "ok", administradores: result });
@@ -128,7 +116,6 @@ router.get('/:id', function (req, res, next) {
     const sql = "SELECT id, nom_admin, contraseña FROM administrador WHERE id = ?";
     conexion.query(sql, [parsedId], function (error, result) {
         if (error) {
-            console.error(error);
             return res.status(500).send("Ocurrió un error al obtener el administrador");
         }
         if (result.length === 0) {
@@ -156,7 +143,6 @@ router.put('/:id', function (req, res, next) {
     const sql = "UPDATE administrador SET nom_admin = ?, contraseña = ? WHERE id = ?";
     conexion.query(sql, [nom_admin, passHasheada, parsedId], function (error, result) {
         if (error) {
-            console.error(error);
             return res.status(500).send("Ocurrió un error al actualizar el administrador");
         }
         res.json({ status: "ok", message: "Administrador actualizado con éxito" });
@@ -175,7 +161,6 @@ router.delete('/:id', function (req, res, next) {
     const sql = "DELETE FROM administrador WHERE id = ?";
     conexion.query(sql, [parsedId], function (error, result) {
         if (error) {
-            console.error(error);
             return res.status(500).send("Ocurrió un error al eliminar el administrador");
         }
         res.json({ status: "ok", message: "Administrador eliminado con éxito" });

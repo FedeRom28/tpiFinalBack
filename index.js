@@ -5,7 +5,7 @@ const port = 3000;
 
 // Configuración de CORS
 const corsOptions = {
-  origin: "http://localhost:5174", // Permitir solicitudes desde este origen
+  origin: "http://localhost:5173", // Permitir solicitudes desde este origen
   methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
   allowedHeaders: ["Content-Type", "Authorization"], // Encabezados permitidos
 };
