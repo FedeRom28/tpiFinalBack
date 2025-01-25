@@ -5,14 +5,6 @@ const { conexion } = require('../db/conexion');
 const TOKEN_SECRET = "46334366";
 
 // Función envolvente para verificar la contraseña con promesas
-const verificarPassPromise = (contraseña, contraseñaHasheada) => {
-    return new Promise((resolve, reject) => {
-        verificarPass(contraseña, contraseñaHasheada, (error, match) => {
-            if (error) return reject(error);
-            resolve(match);
-        });
-    });
-};
 
 // Crear un nuevo administrador
 router.post('/Crear', function (req, res, next) {
