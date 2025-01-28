@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
+const TOKEN_SECRET = "46334366";
 
 
 // Crear un nuevo administrador
@@ -49,6 +50,7 @@ const guardarUsuario = function (nom_admin, passHasheada) {
         });
     });
 };
+
 
 // Obtener todos los administradores
 router.get('/', function (req, res, next) {
