@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al obtener los talles");
     }
-    res.json({
+    return res.json({
       status: "ok",
       talles: result
     });
@@ -26,7 +26,7 @@ router.get("/:id_talles", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al obtener el talle");
     }
-    res.json({
+    return res.json({
       status: "ok",
       talle: result
     });
@@ -43,7 +43,7 @@ router.post("/", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al agregar el talle");
     }
-    res.json({ status: "ok", message: "Talle agregado con éxito", id_talles: result.insertId });
+    return res.json({ status: "ok", message: "Talle agregado con éxito", id_talles: result.insertId });
   });
 });
 
@@ -58,7 +58,7 @@ router.put("/:id_talles", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al actualizar el talle");
     }
-    res.json({ status: "ok", message: "Talle actualizado con éxito" });
+    return res.json({ status: "ok", message: "Talle actualizado con éxito" });
   });
 });
 
@@ -72,7 +72,7 @@ router.delete("/:id_talles", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al eliminar el talle");
     }
-    res.json({ status: "ok", message: "Talle eliminado con éxito" });
+    return res.json({ status: "ok", message: "Talle eliminado con éxito" });
   });
 });
 

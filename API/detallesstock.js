@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al obtener los detalles de stock");
     }
-    res.json({
+    return res.json({
       status: "ok",
       detallesstock: result
     });
@@ -26,7 +26,7 @@ router.get("/:id_Dstock", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al obtener el detalle de stock");
     }
-    res.json({
+    return res.json({
       status: "ok",
       detalle: result
     });
@@ -43,7 +43,7 @@ router.post("/", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al agregar el detalle de stock");
     }
-    res.json({ status: "ok", message: "Detalle de stock agregado con éxito", id_Dstock: result.insertId });
+    return res.json({ status: "ok", message: "Detalle de stock agregado con éxito", id_Dstock: result.insertId });
   });
 });
 
@@ -58,7 +58,7 @@ router.put("/:id_Dstock", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al actualizar el detalle de stock");
     }
-    res.json({ status: "ok", message: "Detalle de stock actualizado con éxito" });
+    return res.json({ status: "ok", message: "Detalle de stock actualizado con éxito" });
   });
 });
 
@@ -72,7 +72,7 @@ router.delete("/:id_Dstock", function (req, res, next) {
       console.error(error);
       return res.status(500).send("Ocurrió un error al eliminar el detalle de stock");
     }
-    res.json({ status: "ok", message: "Detalle de stock eliminado con éxito" });
+    return res.json({ status: "ok", message: "Detalle de stock eliminado con éxito" });
   });
 });
 
