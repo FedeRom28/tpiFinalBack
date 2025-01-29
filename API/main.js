@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { verificarToken } = require('@damianegreco/hashpass');
 
-// Importar las rutas de admin y producto
+// Importar las rutas de admin y productos
+const productosPublic = require('./productosPublic.js');
+const adminPublic = require('./adminPublic.js');
 const adminRouter = require('./Admin.js');
 const productosRouter = require('./Productos.js');
 const categoriasRouter = require('./categorias.js');

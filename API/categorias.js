@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
             console.error(error);
             return res.send("Ocurrió un error al obtener las categorías");
         }
-        res.json({
+        return res.json({
             status: "ok",
             categorias: results
         });
@@ -29,7 +29,7 @@ router.get("/:id", function (req, res, next) {
         if (result.length === 0) {
             return res.status(404).send("Categoría no encontrada");
         }
-        res.json({
+        return res.json({
             status: "ok",
             categoria: result[0]
         });
@@ -50,7 +50,7 @@ router.post("/", function (req, res, next) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al agregar la categoría");
         }
-        res.json({ status: "ok", message: "Categoría agregada exitosamente", id: result.insertId });
+        return res.json({ status: "ok", message: "Categoría agregada exitosamente", id: result.insertId });
     });
 });
 
@@ -72,7 +72,7 @@ router.put("/:id", function (req, res, next) {
         if (result.affectedRows === 0) {
             return res.status(404).send("Categoría no encontrada");
         }
-        res.json({ status: "ok", message: "Categoría actualizada exitosamente" });
+        return res.json({ status: "ok", message: "Categoría actualizada exitosamente" });
     });
 });
 
@@ -88,7 +88,7 @@ router.delete("/:id", function (req, res, next) {
         if (result.affectedRows === 0) {
             return res.status(404).send("Categoría no encontrada");
         }
-        res.json({ status: "ok", message: "Categoría eliminada exitosamente" });
+        return res.json({ status: "ok", message: "Categoría eliminada exitosamente" });
     });
 });
 
