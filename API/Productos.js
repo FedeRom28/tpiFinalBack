@@ -1,19 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
-const multer = require("multer");
-
-// Configuración de multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'imagen/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-
-const upload = multer({ storage });
+const upload = require('../config/uploadConfig'); // Importar la configuración de uploadConfig
 
 // Crear un nuevo producto con imagen
 router.post("/", upload.single('imagen'), function (req, res, next) {
@@ -24,9 +12,9 @@ router.post("/", upload.single('imagen'), function (req, res, next) {
     conexion.query(sql, valores, function (error, result) {
         if (error) {
             console.error(error);
-            return res.send("Ocurrió un error al agregar el producto");
+            return res.status(500).send("Ocurrió un error al agregar el producto");
         }
-        return res.json({ status: "ok", message: "Producto agregado con éxito" });
+        return res.json({ status: "ok", message: "Producto agregado con éxito", producto: { nom_producto, descripcion, precio, id_categorias, imagen } });
     });
 });
 
