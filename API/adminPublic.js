@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
+const { verificarPass, generarToken } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
 
 

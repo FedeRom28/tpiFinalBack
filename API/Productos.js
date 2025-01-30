@@ -1,15 +1,27 @@
 const express = require("express");
 const router = express.Router();
 const { conexion } = require('../db/conexion');
+const multer = require("multer");
 
-// RECIBE = req => params, query, body, headers
-// RESPUESTA = res => status, send, sendFile, json, render
+// Configuración de multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'imagen/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-// Crear un nuevo producto
-router.post("/", function (req, res, next) {
+const upload = multer({ storage });
+
+// Crear un nuevo producto con imagen
+router.post("/", upload.single('imagen'), function (req, res, next) {
     const { nom_producto, descripcion, precio, id_categorias } = req.body;
-    const sql = "INSERT INTO productos (nom_producto, descripcion, precio, id_categorias) VALUES (?, ?, ?, ?)";
-    conexion.query(sql, [nom_producto, descripcion, precio, id_categorias], function (error, result) {
+    const imagen = req.file ? req.file.filename : null;
+    const sql = "INSERT INTO productos (nom_producto, descripcion, precio, id_categorias, imagen) VALUES (?, ?, ?, ?, ?)";
+    const valores = [nom_producto, descripcion, precio, id_categorias, imagen];
+    conexion.query(sql, valores, function (error, result) {
         if (error) {
             console.error(error);
             return res.send("Ocurrió un error al agregar el producto");
@@ -18,12 +30,14 @@ router.post("/", function (req, res, next) {
     });
 });
 
-// Actualizar un producto por ID
-router.put("/:id", function (req, res, next) {
+// Actualizar un producto por ID con imagen
+router.put("/:id", upload.single('imagen'), function (req, res, next) {
     const { id } = req.params;
     const { nom_producto, descripcion, precio, id_categorias } = req.body;
-    const sql = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ? WHERE id_productos = ?";
-    conexion.query(sql, [nom_producto, descripcion, precio, id_categorias, id], function (error, result) {
+    const imagen = req.file ? req.file.filename : null;
+    const sql = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ?, imagen = ? WHERE id_productos = ?";
+    const valores = [nom_producto, descripcion, precio, id_categorias, imagen, id];
+    conexion.query(sql, valores, function (error, result) {
         if (error) {
             console.error(error);
             return res.status(500).send("Ocurrió un error al actualizar el producto");

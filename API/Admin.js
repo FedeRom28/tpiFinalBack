@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { hashPass, verificarPass, generarToken } = require('@damianegreco/hashpass');
+const { hashPass } = require('@damianegreco/hashpass');
 const { conexion } = require('../db/conexion');
-const TOKEN_SECRET = "46334366";
-
 
 // Crear un nuevo administrador
 router.post('/Crear', function (req, res, next) {
