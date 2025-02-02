@@ -59,4 +59,6 @@ router.use('/talles', function (req, res, next) {
 });
 router.use('/talles', tallesRouter); // Usar las rutas de talles
 
+
+
 module.exports = router;
