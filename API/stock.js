@@ -59,6 +59,10 @@ router.put("/:id", function (req, res, next) {
     const { id } = req.params;
     const { id_productos, cantidad, id_talles } = req.body;
 
+    console.log(id_productos, cantidad, id_talles);
+    
+    
+
     if (!id_productos || !cantidad || !id_talles) {
         return res.status(400).send("Todos los campos son obligatorios");
     }
