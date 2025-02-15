@@ -8,8 +8,7 @@ const adminPublic = require('./adminPublic.js');
 const adminRouter = require('./Admin.js');
 const productosRouter = require('./Productos.js');
 const categoriasRouter = require('./categorias.js');
-const tallesRouter = require('./talles.js'); // Importar las rutas de talles
-const stockRouter = require('./stock.js'); // Importar las rutas de stock
+const tallesRouter = require('./talles.js');
 
 const TOKEN_SECRET = "hju32_okfd";
 
@@ -59,16 +58,5 @@ router.use('/talles', function (req, res, next) {
     }
 });
 router.use('/talles', tallesRouter); // Usar las rutas de talles
-
-// router.use('/stock', function (req, res, next) {
-//     const token = req.headers.authorization;
-//     const verification = verificarToken(token, TOKEN_SECRET);
-//     if (verification) {
-//         next();
-//     } else {
-//         return res.status(403).json({ status: "error", error: "acceso denegado" });
-//     }
-// });
-// router.use('/stock', stockRouter); // Usar las rutas de stock
 
 module.exports = router;
