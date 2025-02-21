@@ -6,9 +6,9 @@ const port = 3000;
 
 // Configuración de CORS
 const corsOptions = {
-  origin: "http://localhost:5173", // Permitir solicitudes desde este origen
-  methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
-  allowedHeaders: ["Content-Type", "Authorization"], // Encabezados permitidos
+  origin: "http://localhost:5173", 
+  methods: ["GET", "POST", "PUT", "DELETE"], 
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsPath));

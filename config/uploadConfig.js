@@ -1,23 +1,23 @@
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const multer = require('multer');
 
-// Configuración del directorio de subidas
-const uploadsPath = path.join(__dirname, '..', 'uploads');
-
-if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
-}
-
-// Configuración de almacenamiento con multer
+// Configuración de almacenamiento con verificación de duplicados
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsPath);
-    },
-    filename: function (req, file, cb) {
-        const filename = `${Date.now()}${path.extname(file.originalname)}`;
-        cb(null, filename);
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const filename = file.originalname;
+    const filepath = path.join(__dirname, '../uploads/', filename);
+
+    // Comprobar si el archivo ya existe
+    if (fs.existsSync(filepath)) {
+      cb(null, filename); // Usa el nombre del archivo existente
+    } else {
+      cb(null, filename); // Crea un nuevo archivo si no existe
     }
+  }
 });
 
 const upload = multer({ storage: storage });

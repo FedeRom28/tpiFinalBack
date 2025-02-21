@@ -10,7 +10,6 @@ router.post("/", upload.single('imagen'), function (req, res, next) {
 
     console.log(req.file, imagen);
     
-
     if(imagen !== null){
         const sqlProducto = "INSERT INTO productos (nom_producto, descripcion, precio, id_categorias, imagen, id_talles, cantidad) VALUES (?, ?, ?, ?, ?, ?, ?)";
         const valoresProducto = [nom_producto, descripcion, precio, id_categorias, imagen, id_talles, cantidad];
@@ -22,8 +21,7 @@ router.post("/", upload.single('imagen'), function (req, res, next) {
             }
             return res.json({ status: "ok", message: "Producto agregado con éxito" });
         });
-    }
-    else{
+    } else {
         const sqlProducto = "INSERT INTO productos (nom_producto, descripcion, precio, id_categorias, id_talles, cantidad) VALUES (?, ?, ?, ?, ?, ?)";
         const valoresProducto = [nom_producto, descripcion, precio, id_categorias, id_talles, cantidad];
 
@@ -35,7 +33,6 @@ router.post("/", upload.single('imagen'), function (req, res, next) {
             return res.json({ status: "ok", message: "Producto agregado con éxito" });
         });
     }
-    
 });
 
 // Actualizar un producto por ID con imagen, talle y cantidad
@@ -47,7 +44,7 @@ router.put("/:id", upload.single('imagen'), function (req, res, next) {
     console.log(req.file, imagen);
 
     if(imagen !== null){
-        console.log("entro a imagen");
+        console.log("Se actualizó con imagen");
         
         const sqlProducto = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ?, imagen = ?, id_talles = ?, cantidad = ? WHERE id_productos = ?";
         const valoresProducto = [nom_producto, descripcion, precio, id_categorias, imagen, id_talles, cantidad, id];
@@ -60,10 +57,8 @@ router.put("/:id", upload.single('imagen'), function (req, res, next) {
             console.log("Producto actualizado con éxito");
             return res.json({ status: "ok", message: "Producto actualizado con éxito" });
         });
-    }
-    else{
-
-        console.log("entro a no imagen");
+    } else {
+        console.log("Se actualizó sin imagen");
         
         const sqlProducto = "UPDATE productos SET nom_producto = ?, descripcion = ?, precio = ?, id_categorias = ?, id_talles = ?, cantidad = ? WHERE id_productos = ?";
         const valoresProducto = [nom_producto, descripcion, precio, id_categorias, id_talles, cantidad, id];
@@ -74,7 +69,6 @@ router.put("/:id", upload.single('imagen'), function (req, res, next) {
                 return res.status(500).send("Ocurrió un error al actualizar el producto");
             }
             console.log("Producto actualizado con éxito");
-            
             return res.json({ status: "ok", message: "Producto actualizado con éxito" });
         });
     }
